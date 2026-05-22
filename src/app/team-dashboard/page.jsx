@@ -629,38 +629,6 @@ function AddBillTab({ currentUser, onCreated }) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <section className="rounded-[22px] border border-[#00BC7D]/20 bg-[#00BC7D]/[0.07] p-3 sm:rounded-[28px] sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-bold text-neutral-900">
-              নতুন হাসিল বিল তৈরি করুন
-            </p>
-
-            <p className="mt-1 text-xs font-medium leading-5 text-neutral-500">
-              বিলটি স্বয়ংক্রিয়ভাবে পরিশোধিত ও নগদ টাকা হিসেবে সংরক্ষণ হবে।
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <SoftBadge
-              icon={<FiHome className="h-3.5 w-3.5" />}
-              className="border-blue-200 bg-blue-50 text-blue-700"
-            >
-              {typeof currentUser?.client === "object"
-                ? currentUser?.client?.name || "Client"
-                : "Client"}
-            </SoftBadge>
-
-            <SoftBadge
-              icon={<FiGrid className="h-3.5 w-3.5" />}
-              className="border-violet-200 bg-violet-50 text-violet-700"
-            >
-              Counter {currentUser?.counterNumber || "—"}
-            </SoftBadge>
-          </div>
-        </div>
-      </section>
-
       <section className={cn(card, "overflow-hidden")}>
         <div className="border-b border-neutral-100 bg-white px-4 py-4 sm:px-6 sm:py-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -676,24 +644,19 @@ function AddBillTab({ currentUser, onCreated }) {
 
             <div className="flex flex-wrap gap-2">
               <SoftBadge
-                icon={<FiCheckCircle className="h-3.5 w-3.5" />}
-                className="border-[#00BC7D]/25 bg-[#00BC7D]/10 text-[#008E60]"
+                icon={<FiHome className="h-3.5 w-3.5" />}
+                className="border-blue-200 bg-blue-50 text-blue-700"
               >
-                পরিশোধিত
+                {typeof currentUser?.client === "object"
+                  ? currentUser?.client?.name || "Client"
+                  : "Client"}
               </SoftBadge>
 
               <SoftBadge
-                icon={<FiCreditCard className="h-3.5 w-3.5" />}
-                className="border-sky-200 bg-sky-50 text-sky-700"
+                icon={<FiGrid className="h-3.5 w-3.5" />}
+                className="border-violet-200 bg-violet-50 text-violet-700"
               >
-                নগদ টাকা
-              </SoftBadge>
-
-              <SoftBadge
-                icon={<FiTag className="h-3.5 w-3.5" />}
-                className="border-amber-200 bg-amber-50 text-amber-700"
-              >
-                শতাংশ
+                Counter {currentUser?.counterNumber || "—"}
               </SoftBadge>
             </div>
           </div>
@@ -812,17 +775,10 @@ function AddBillTab({ currentUser, onCreated }) {
                   </h3>
 
                   <p className="text-xs font-medium text-neutral-500">
-                    হাসিলের ধরন শতাংশ হিসেবে সেট করা আছে।
+                    হাসিল শতাংশ লিখুন।
                   </p>
                 </div>
               </div>
-
-              <SoftBadge
-                icon={<FiTag className="h-3.5 w-3.5" />}
-                className="border-[#00BC7D]/25 bg-white text-[#008E60]"
-              >
-                শতাংশ ভিত্তিক
-              </SoftBadge>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -896,40 +852,6 @@ function AddBillTab({ currentUser, onCreated }) {
                 />
               </div>
             </Field>
-          </section>
-
-          <section className="rounded-[22px] border border-[#00BC7D]/20 bg-[#00BC7D]/[0.05] p-4 sm:rounded-[26px] sm:p-5">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white bg-white px-4 py-3">
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                  বিল অবস্থা
-                </p>
-
-                <p className="mt-1 text-sm font-black text-[#008E60]">
-                  পরিশোধিত
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white bg-white px-4 py-3">
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                  পেমেন্ট
-                </p>
-
-                <p className="mt-1 text-sm font-black text-neutral-950">
-                  নগদ টাকা
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white bg-white px-4 py-3">
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">
-                  হিসাব
-                </p>
-
-                <p className="mt-1 text-sm font-black text-neutral-950">
-                  শতাংশ
-                </p>
-              </div>
-            </div>
           </section>
 
           <div className="grid grid-cols-2 gap-3 sm:flex sm:justify-end">
@@ -1813,7 +1735,6 @@ export default function TeamHasilBillingPage() {
 
   async function handleCreatedBill() {
     await fetchBills(1);
-    setActiveTab("bills");
   }
 
   async function handleRefreshBills() {
