@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+:root {
+  /* This ensures that even if the class fails, the variable is mapped */
+  --font-dm-sans: 'DM Sans', sans-serif;
+}
+
+body {
+  /* This forces the whole app to use the DM Sans variable */
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui;
+}
