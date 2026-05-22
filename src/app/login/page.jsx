@@ -310,15 +310,7 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-center text-sm text-slate-600">
-              Need to create the first admin?
-              <Link
-                href="/register"
-                className="ml-1 font-semibold text-emerald-700 transition hover:text-emerald-800"
-              >
-                Register here
-              </Link>
-            </div>
+          
           </div>
         </section>
       </div>
