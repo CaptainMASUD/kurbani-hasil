@@ -83,7 +83,7 @@ function createEmptyBillForm() {
     buyerPhone: "",
     animalType: "cow",
     animalPrice: "",
-    hasilCalculationType: "fixed",
+    hasilCalculationType: "percentage",
     hasilRatePercent: "",
     hasilFixedAmount: "",
     status: "paid",
@@ -559,11 +559,11 @@ function AddBillTab({ currentUser, onCreated }) {
       buyerPhone: form.buyerPhone.trim(),
       animalType: form.animalType,
       animalPrice: Number(form.animalPrice || 0),
-      hasilCalculationType: form.hasilCalculationType,
+      hasilCalculationType: "percentage",
       hasilRatePercent: Number(form.hasilRatePercent || 0),
-      hasilFixedAmount: Number(form.hasilFixedAmount || 0),
-      status: form.status,
-      paymentMethod: form.paymentMethod,
+      hasilFixedAmount: 0,
+      status: "paid",
+      paymentMethod: "nagad",
       issuedAt: form.issuedDate,
     };
   }
@@ -583,18 +583,8 @@ function AddBillTab({ currentUser, onCreated }) {
       return "সঠিক হাসিলের ধরন নির্বাচন করুন।";
     }
 
-    if (
-      payload.hasilCalculationType === "percentage" &&
-      (payload.hasilRatePercent < 0 || payload.hasilRatePercent > 100)
-    ) {
+    if (payload.hasilRatePercent < 0 || payload.hasilRatePercent > 100) {
       return "হাসিল শতাংশ ০ থেকে ১০০ এর মধ্যে হতে হবে।";
-    }
-
-    if (
-      payload.hasilCalculationType === "fixed" &&
-      payload.hasilFixedAmount < 0
-    ) {
-      return "নির্দিষ্ট হাসিলের টাকা ০ বা তার বেশি হতে হবে।";
     }
 
     if (!BILL_STATUSES.includes(payload.status)) {
@@ -641,9 +631,15 @@ function AddBillTab({ currentUser, onCreated }) {
     <div className="space-y-4 sm:space-y-6">
       <section className="rounded-[22px] border border-[#00BC7D]/20 bg-[#00BC7D]/[0.07] p-3 sm:rounded-[28px] sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm font-semibold text-neutral-700">
-            আপনার নির্ধারিত ক্লায়েন্ট ও কাউন্টার
-          </p>
+          <div>
+            <p className="text-sm font-bold text-neutral-900">
+              নতুন হাসিল বিল তৈরি করুন
+            </p>
+
+            <p className="mt-1 text-xs font-medium leading-5 text-neutral-500">
+              বিলটি স্বয়ংক্রিয়ভাবে পরিশোধিত ও নগদ টাকা হিসেবে সংরক্ষণ হবে।
+            </p>
+          </div>
 
           <div className="flex flex-wrap gap-2">
             <SoftBadge
@@ -666,14 +662,61 @@ function AddBillTab({ currentUser, onCreated }) {
       </section>
 
       <section className={cn(card, "overflow-hidden")}>
-        <div className="border-b border-neutral-100 px-4 py-4 sm:px-6 sm:py-5">
-          <h2 className="text-base font-bold tracking-tight text-neutral-950 sm:text-lg">
-            নতুন হাসিল বিল
-          </h2>
+        <div className="border-b border-neutral-100 bg-white px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-base font-bold tracking-tight text-neutral-950 sm:text-lg">
+                বিলের তথ্য
+              </h2>
+
+              <p className="mt-1 text-xs font-medium text-neutral-500 sm:text-sm">
+                প্রয়োজনীয় তথ্য দিন, সিস্টেম নিজে হিসাব করে দিবে।
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <SoftBadge
+                icon={<FiCheckCircle className="h-3.5 w-3.5" />}
+                className="border-[#00BC7D]/25 bg-[#00BC7D]/10 text-[#008E60]"
+              >
+                পরিশোধিত
+              </SoftBadge>
+
+              <SoftBadge
+                icon={<FiCreditCard className="h-3.5 w-3.5" />}
+                className="border-sky-200 bg-sky-50 text-sky-700"
+              >
+                নগদ টাকা
+              </SoftBadge>
+
+              <SoftBadge
+                icon={<FiTag className="h-3.5 w-3.5" />}
+                className="border-amber-200 bg-amber-50 text-amber-700"
+              >
+                শতাংশ
+              </SoftBadge>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
           <section className="rounded-[22px] border border-neutral-200 bg-neutral-50/70 p-4 sm:rounded-[26px] sm:p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#00BC7D] text-white">
+                <FiUser className="h-4 w-4" />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-neutral-950">
+                  ক্রেতার তথ্য
+                </h3>
+
+                <p className="text-xs font-medium text-neutral-500">
+                  ক্রেতার নাম অবশ্যই দিতে হবে।
+                </p>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field title="ক্রেতার নাম *">
                 <input
@@ -694,9 +737,30 @@ function AddBillTab({ currentUser, onCreated }) {
                   }
                   className={input}
                   placeholder="ঐচ্ছিক"
+                  inputMode="tel"
                 />
               </Field>
+            </div>
+          </section>
 
+          <section className="rounded-[22px] border border-neutral-200 bg-white p-4 sm:rounded-[26px] sm:p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                <FiShoppingBag className="h-4 w-4" />
+              </div>
+
+              <div>
+                <h3 className="text-sm font-bold text-neutral-950">
+                  পশুর তথ্য
+                </h3>
+
+                <p className="text-xs font-medium text-neutral-500">
+                  পশুর ধরন ও বিক্রয়মূল্য দিন।
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field title="পশুর ধরন *">
                 <select
                   value={form.animalType}
@@ -714,38 +778,56 @@ function AddBillTab({ currentUser, onCreated }) {
               </Field>
 
               <Field title="পশুর দাম *">
-                <input
-                  type="number"
-                  min="0"
-                  inputMode="decimal"
-                  value={form.animalPrice}
-                  onChange={(event) =>
-                    updateField("animalPrice", event.target.value)
-                  }
-                  className={input}
-                  placeholder="0"
-                />
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400">
+                    Tk
+                  </span>
+
+                  <input
+                    type="number"
+                    min="0"
+                    inputMode="decimal"
+                    value={form.animalPrice}
+                    onChange={(event) =>
+                      updateField("animalPrice", event.target.value)
+                    }
+                    className={cn(input, "pl-11")}
+                    placeholder="0"
+                  />
+                </div>
               </Field>
             </div>
           </section>
 
           <section className="rounded-[22px] border border-[#00BC7D]/20 bg-[#00BC7D]/[0.06] p-4 sm:rounded-[26px] sm:p-5">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field title="হাসিলের ধরন *">
-                <select
-                  value={form.hasilCalculationType}
-                  onChange={(event) =>
-                    updateField("hasilCalculationType", event.target.value)
-                  }
-                  className={input}
-                >
-                  <option value="fixed">নির্দিষ্ট টাকা</option>
-                  <option value="percentage">শতাংশ</option>
-                </select>
-              </Field>
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#00BC7D] text-white">
+                  <FiDollarSign className="h-4 w-4" />
+                </div>
 
-              {form.hasilCalculationType === "percentage" ? (
-                <Field title="হাসিল শতাংশ *">
+                <div>
+                  <h3 className="text-sm font-bold text-neutral-950">
+                    হাসিল হিসাব
+                  </h3>
+
+                  <p className="text-xs font-medium text-neutral-500">
+                    হাসিলের ধরন শতাংশ হিসেবে সেট করা আছে।
+                  </p>
+                </div>
+              </div>
+
+              <SoftBadge
+                icon={<FiTag className="h-3.5 w-3.5" />}
+                className="border-[#00BC7D]/25 bg-white text-[#008E60]"
+              >
+                শতাংশ ভিত্তিক
+              </SoftBadge>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <Field title="হাসিল শতাংশ *">
+                <div className="relative">
                   <input
                     type="number"
                     min="0"
@@ -755,30 +837,20 @@ function AddBillTab({ currentUser, onCreated }) {
                     onChange={(event) =>
                       updateField("hasilRatePercent", event.target.value)
                     }
-                    className={input}
-                    placeholder="যেমন: ২"
+                    className={cn(input, "pr-12")}
+                    placeholder="যেমন: ৫"
                   />
-                </Field>
-              ) : (
-                <Field title="নির্দিষ্ট হাসিলের টাকা *">
-                  <input
-                    type="number"
-                    min="0"
-                    inputMode="decimal"
-                    value={form.hasilFixedAmount}
-                    onChange={(event) =>
-                      updateField("hasilFixedAmount", event.target.value)
-                    }
-                    className={input}
-                    placeholder="0"
-                  />
-                </Field>
-              )}
+
+                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-neutral-400">
+                    %
+                  </span>
+                </div>
+              </Field>
             </div>
 
             <div className="mt-4 grid grid-cols-1 items-stretch gap-3 sm:mt-5 sm:grid-cols-3">
               <AmountPreviewCard
-                title="দাম"
+                title="পশুর দাম"
                 value={formatMoney(preview.animalPrice)}
               />
 
@@ -796,53 +868,67 @@ function AddBillTab({ currentUser, onCreated }) {
           </section>
 
           <section className="rounded-[22px] border border-neutral-200 bg-white p-4 sm:rounded-[26px] sm:p-5">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <Field title="বিলের তারিখ *">
-                <div className="relative">
-                  <FiCalendar className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-100 text-blue-700">
+                <FiCalendar className="h-4 w-4" />
+              </div>
 
-                  <input
-                    type="date"
-                    value={form.issuedDate}
-                    onChange={(event) =>
-                      updateField("issuedDate", event.target.value)
-                    }
-                    className={cn(input, "pl-11")}
-                  />
-                </div>
-              </Field>
+              <div>
+                <h3 className="text-sm font-bold text-neutral-950">তারিখ</h3>
 
-              <Field title="বিলের অবস্থা *">
-                <select
-                  value={form.status}
+                <p className="text-xs font-medium text-neutral-500">
+                  আজকের তারিখ অটো সিলেক্ট করা আছে, চাইলে পরিবর্তন করা যাবে।
+                </p>
+              </div>
+            </div>
+
+            <Field title="বিলের তারিখ *">
+              <div className="relative">
+                <FiCalendar className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+
+                <input
+                  type="date"
+                  value={form.issuedDate}
                   onChange={(event) =>
-                    updateField("status", event.target.value)
+                    updateField("issuedDate", event.target.value)
                   }
-                  className={input}
-                >
-                  <option value="paid">পরিশোধিত</option>
-                  <option value="unpaid">অপরিশোধিত</option>
-                  <option value="cancelled">বাতিল</option>
-                </select>
-              </Field>
+                  className={cn(input, "pl-11")}
+                />
+              </div>
+            </Field>
+          </section>
 
-              <Field title="পেমেন্ট পদ্ধতি *">
-                <select
-                  value={form.paymentMethod}
-                  onChange={(event) =>
-                    updateField("paymentMethod", event.target.value)
-                  }
-                  className={input}
-                >
-                  <option value="nagad">নগদ টাকা</option>
-                  <option value="cash">ক্যাশ</option>
-                  <option value="bkash">বিকাশ</option>
-                  <option value="rocket">রকেট</option>
-                  <option value="bank">ব্যাংক</option>
-                  <option value="card">কার্ড</option>
-                  <option value="other">অন্যান্য</option>
-                </select>
-              </Field>
+          <section className="rounded-[22px] border border-[#00BC7D]/20 bg-[#00BC7D]/[0.05] p-4 sm:rounded-[26px] sm:p-5">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white bg-white px-4 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                  বিল অবস্থা
+                </p>
+
+                <p className="mt-1 text-sm font-black text-[#008E60]">
+                  পরিশোধিত
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white bg-white px-4 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                  পেমেন্ট
+                </p>
+
+                <p className="mt-1 text-sm font-black text-neutral-950">
+                  নগদ টাকা
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white bg-white px-4 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">
+                  হিসাব
+                </p>
+
+                <p className="mt-1 text-sm font-black text-neutral-950">
+                  শতাংশ
+                </p>
+              </div>
             </div>
           </section>
 
@@ -863,12 +949,12 @@ function AddBillTab({ currentUser, onCreated }) {
               {submitting ? (
                 <>
                   <FiLoader className="h-4 w-4 animate-spin" />
-                  সংরক্ষণ
+                  সংরক্ষণ হচ্ছে
                 </>
               ) : (
                 <>
                   <FiPlus className="h-4 w-4" />
-                  বিল তৈরি
+                  বিল তৈরি করুন
                 </>
               )}
             </button>
